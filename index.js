@@ -17,6 +17,11 @@ app.use(cors()); //needs cors to connect to frontend!!!
 // Connect to MongoDB
 getConnection();
 
+// Print this out on the first window
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+  })
+
 // Use the auth routes
 app.use('/auth', authRoutes);
 
@@ -25,11 +30,6 @@ app.use('/group',groupRoutes);
 
 // Task routes
 app.use('/task',taskRoutes);
-
-// Print this out on the first window
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
 
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)
