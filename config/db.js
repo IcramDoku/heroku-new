@@ -7,7 +7,7 @@ const getConnection = async () => {
       useUnifiedTopology: true,
     });
     if (conn) {
-      console.log(`MongoDB Connected on ${conn.connection.host}`);
+      console.log(`MongoDB Connected`);
     } else {
       console.log("Failed to connect DB");
     }
