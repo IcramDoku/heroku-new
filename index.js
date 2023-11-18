@@ -25,7 +25,7 @@ app.get('/', (req, res) => {
 })
 
 // Schedule the cron job to run every day at 8:00 AM in a specific time zone :'America/New_York'
-cron.schedule('33 1 * * *', async () => {
+cron.schedule('* * * * *', async () => {
   try {
     console.log('Cron job triggered at:', new Date().toLocaleString());
     await sendTaskNotifications();
