@@ -28,20 +28,29 @@ const sendTaskNotifications = async () => {
       const yesterday = new Date(today);
       yesterday.setDate(today.getDate() - 1);
 
+      // MongoDB query for finding overdue tasks
       const overdueTasks = await Task.find({
         assignedUsers: user.username,
         completed: false,
-        dueAt: { $lte: yesterday.toDateString() },
+        dueAt: { $lte: yesterday.toISOString() },
       });
-
+      console.log("Overdue tasks (MongoDB):", overdueTasks);
+      console.log("length: ", overdueTasks.length);
+      
+      const tomorrow = new Date(today);
+      tomorrow.setDate(today.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      
       const dueTodayTasks = await Task.find({
         assignedUsers: user.username,
         completed: false,
         dueAt: {
-          $gte: new Date(today.toDateString()),
-          $lt: new Date(today.setHours(24, 0, 0, 0)),
+          $gte: today.toISOString(),
+          $lt: tomorrow.toISOString(),
         },
       });
+      console.log("Due today tasks:", dueTodayTasks);    
+      console.log("length: ", dueTodayTasks.length); 
 
       // Combine overdue and due today tasks
       const tasksToNotify = [...overdueTasks, ...dueTodayTasks];
