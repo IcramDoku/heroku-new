@@ -33,6 +33,7 @@ const sendTaskNotifications = async () => {
         completed: false,
         dueAt: { $lte: yesterday.toDateString() },
       });
+      console.log(overdueTasks);
 
       const dueTodayTasks = await Task.find({
         assignedUsers: user.username,
@@ -42,6 +43,7 @@ const sendTaskNotifications = async () => {
           $lt: new Date(today.setHours(24, 0, 0, 0)),
         },
       });
+      console.log(dueTodayTasks);
 
       // Combine overdue and due today tasks
       const tasksToNotify = [...overdueTasks, ...dueTodayTasks];
