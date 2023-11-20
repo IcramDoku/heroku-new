@@ -14,6 +14,11 @@ const generateSecretKey = () => {
   return crypto.randomBytes(64).toString("hex");
 };
 
+// for password recovery
+const generateVerificationCode = () => {
+  return crypto.randomBytes(3).toString('hex').toUpperCase();
+};
+
 // Create a transporter using your email service (e.g., Gmail)
 const transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
