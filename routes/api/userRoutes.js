@@ -118,30 +118,47 @@ router.post("/login_user", async (req, res) => {
 });
 
 
+// Express route to handle the deletion of a user and associated data
 router.delete("/delete_user/:username", async (req, res) => {
   const usernameID = req.params.username;
   try {
-    console.log("inside of delete_user", usernameID)
+    // Find the user by their username
     const user = await User.findOne({ username: usernameID });
-    // Find all the owned groups
-    var ownedGroup = await Group.findOne({ owner: user._id });
-    while(ownedGroup) {
-      // Delete all group tasks
+
+    // Find all the groups owned by the user
+    const ownedGroups = await Group.find({ owner: user._id });
+
+    // Loop through each owned group for deletion
+    for (const ownedGroup of ownedGroups) {
+      // Remove all assigned users from tasks in the group
+      await Task.updateMany({ groupId: ownedGroup._id }, { $set: { assignedUsers: [] } });
+      // Remove all members from the members list in the group
+      await Group.updateMany({ _id: ownedGroup._id }, { $set: { members: [] } });
+
+      // Delete the tasks associated with the group
       await Task.deleteMany({ groupId: ownedGroup._id });
-      await AllTasks.deleteMany({ groupId: ownedGroup._id })
-      //Delete the group
-      await Group.deleteOne({ _id: ownedGroup._id });
-      ownedGroup = await Group.findOne({ owner: user._id });
+      // Delete all tasks associated with the group in AllTasks collection by group ID
+      await AllTasks.deleteMany({ groupId: ownedGroup._id });
+      // Delete the group itself
+      await Group.findByIdAndRemove(ownedGroup._id);
     }
-    // Remove the user from all assigned tasks
+
+    // Remove the user from all groups and members they are associated with
+    // Remove user from assigned users in all groups
+    await Task.updateMany({}, { $pull: { assignedUsers: user.username } });
+    // Remove user from the members list of all groups
+    await Group.updateMany({}, { $pull: { members: user._id } });
+
+    // Delete all tasks associated with the user in AllTasks collection by user ID
     await AllTasks.deleteMany({ userId: user._id });
-    await Task.updateMany({}, { $pull: { assignedUsers: user.username }});
-    // Remove the user from all groups they're in
-    await Group.updateMany({}, { $pull: { members: user._id }})
+
     // Delete the actual user
     await User.deleteOne({ _id: user._id });
-    res.status(204).send(); // 204 No Content response
+
+    // Respond with a success status
+    res.status(204).send("Successfully deleted the user!");
   } catch (error) {
+    // Handle errors and respond with a server error status
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }

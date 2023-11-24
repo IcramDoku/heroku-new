@@ -54,6 +54,9 @@ const sendTaskNotifications = async () => {
 
       // Combine overdue and due today tasks
       const tasksToNotify = [...overdueTasks, ...dueTodayTasks];
+      
+      // Sort tasks by due date in ascending order
+      tasksToNotify.sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt));
 
       // Send email notification if there are tasks to notify
       if (tasksToNotify.length > 0) {
