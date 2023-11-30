@@ -74,8 +74,8 @@ router.put("/remove_member/:username/:groupID", async (req, res) => {
       { groupId: groupID },
       { $pull: { assignedUsers: user.username } }
     );
-    //when remove that member from the group, remove all that group's tasks from alltasks
-    await AllTasks.deleteMany({ groupId: groupID})
+    //when remove that member from the group, remove all assgined tasks to that user
+    await AllTasks.deleteMany({ userId: userID})
 
     res
       .status(201)
