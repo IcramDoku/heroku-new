@@ -117,6 +117,27 @@ router.post("/login_user", async (req, res) => {
   }
 });
 
+// Route to find email
+router.get("/get_email/:username", async (req, res) => {
+  const usernameID = req.params.username;
+  try {
+    const user = await User.findOne({ username: usernameID });
+
+    if (!user) {
+      // If user is not found, return an appropriate response
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const email = user.email;
+
+    // Return the email from this route
+    res.json({ email });
+  } catch (error) {
+    console.error(error);
+    // Handle other errors and return an appropriate response
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
 
 // Express route to handle the deletion of a user and associated data
 router.delete("/delete_user/:username", async (req, res) => {
