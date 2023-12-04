@@ -74,10 +74,15 @@ router.put("/add_member_to_task/:taskId/:memberUsername", async (req, res) => {
       groupId,
       taskId,
     });
-
-    await allTasks.save();
-
-    res.status(201).json({ message: "Successfuly assigned user to task" });
+    if (!userId || !groupId || !taskId) {
+      console.error('Missing required fields. Cannot create entry.');
+      //do not save to AllTask but create the task
+      res.status(201).json({ message: "Successfuly assigned user to task" });
+    }  else {
+      //save to AllTasks when all the values are present
+      await allTasks.save();
+      res.status(201).json({ message: "Successfuly assigned user to task" });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
